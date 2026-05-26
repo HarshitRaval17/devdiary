@@ -1,27 +1,41 @@
 import { useNavigate, useLocation } from 'react-router-dom'
+import { useTheme } from '../context/ThemeContext'
 
 const navItems = [
-  { label: 'Dashboard', path: '/dashboard' },
-  { label: 'My Logs', path: '/logs' },
-  { label: 'Add Log', path: '/add-log' },
-  { label: 'Profile', path: '/profile' },
+  { label: 'Dashboard',  path: '/dashboard' },
+  { label: 'My Logs',    path: '/logs' },
+  { label: 'Add Log',    path: '/add-log' },
+  { label: 'Goals',      path: '/goals' },
+  { label: 'Profile',    path: '/profile' },
 ]
 
 export default function Sidebar() {
   const navigate = useNavigate()
   const location = useLocation()
+  const { isDark, toggle, t } = useTheme()
 
   return (
-    <div style={{ width: '220px', minHeight: '100vh', background: '#0D1117', borderRight: '1px solid #21262D', display: 'flex', flexDirection: 'column', position: 'fixed', top: 0, left: 0 }}>
+    <div style={{
+      width: '220px',
+      minHeight: '100vh',
+      background: t.sidebar,
+      borderRight: `1px solid ${t.border}`,
+      display: 'flex',
+      flexDirection: 'column',
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      transition: 'background 0.2s, border-color 0.2s',
+    }}>
 
       {/* Logo */}
-      <div style={{ padding: '20px', borderBottom: '1px solid #21262D', display: 'flex', alignItems: 'center', gap: '8px' }}>
-        <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#58A6FF', flexShrink: 0 }}></div>
-        <span style={{ color: '#58A6FF', fontWeight: '600', fontSize: '18px' }}>DevDiary</span>
+      <div style={{ padding: '20px', borderBottom: `1px solid ${t.border}`, display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: t.accent, flexShrink: 0 }} />
+        <span style={{ color: t.accent, fontWeight: '700', fontSize: '18px', letterSpacing: '-0.3px' }}>DevDiary</span>
       </div>
 
       {/* Nav */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '8px', flex: 1 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', marginTop: '10px', flex: 1 }}>
         {navItems.map((item) => {
           const isActive = location.pathname === item.path
           return (
@@ -32,26 +46,63 @@ export default function Sidebar() {
                 padding: '10px 20px',
                 fontSize: '13px',
                 cursor: 'pointer',
-                color: isActive ? '#58A6FF' : '#8B949E',
-                background: isActive ? '#161B22' : 'transparent',
-                borderLeft: isActive ? '2px solid #58A6FF' : '2px solid transparent',
-              }}>
+                color: isActive ? t.accent : t.muted,
+                background: isActive ? (isDark ? '#161B22' : '#EAF2FF') : 'transparent',
+                borderLeft: `2px solid ${isActive ? t.accent : 'transparent'}`,
+                transition: 'background 0.15s, color 0.15s',
+                fontWeight: isActive ? '500' : '400',
+              }}
+              onMouseEnter={e => { if (!isActive) e.currentTarget.style.color = t.text }}
+              onMouseLeave={e => { if (!isActive) e.currentTarget.style.color = t.muted }}
+            >
               {item.label}
             </div>
           )
         })}
       </div>
 
-      {/* Bottom */}
-      <div style={{ padding: '0 20px 20px' }}>
+      {/* Theme Toggle */}
+      <div style={{ padding: '16px 20px', borderTop: `1px solid ${t.border}` }}>
         <div
-          onClick={() => navigate('/')}
-          style={{ padding: '10px 0', fontSize: '13px', color: '#8B949E', cursor: 'pointer' }}>
-          Settings
+          onClick={toggle}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '8px 12px',
+            borderRadius: '8px',
+            background: isDark ? '#161B22' : '#F0F2F5',
+            border: `1px solid ${t.border}`,
+            cursor: 'pointer',
+            marginBottom: '12px',
+            transition: 'background 0.2s',
+          }}>
+          <span style={{ fontSize: '12px', color: t.muted }}>
+            {isDark ? '🌙 Dark' : '☀️ Light'}
+          </span>
+          {/* Toggle pill */}
+          <div style={{
+            width: '32px', height: '18px', borderRadius: '10px',
+            background: isDark ? t.accent : '#CBD5E1',
+            position: 'relative', transition: 'background 0.2s',
+          }}>
+            <div style={{
+              width: '12px', height: '12px', borderRadius: '50%',
+              background: '#fff',
+              position: 'absolute',
+              top: '3px',
+              left: isDark ? '17px' : '3px',
+              transition: 'left 0.2s',
+            }} />
+          </div>
         </div>
+
         <div
           onClick={() => navigate('/')}
-          style={{ padding: '10px 0', fontSize: '13px', color: '#8B949E', cursor: 'pointer' }}>
+          style={{ padding: '8px 0', fontSize: '13px', color: t.muted, cursor: 'pointer' }}
+          onMouseEnter={e => e.currentTarget.style.color = t.text}
+          onMouseLeave={e => e.currentTarget.style.color = t.muted}
+        >
           Logout
         </div>
       </div>
